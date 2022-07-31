@@ -27,9 +27,9 @@ import Momemt from "react-moment";
 const Post = ({ id, userImg, picture, caption, username }) => {
   const { data: session } = useSession();
   const [comments, setComments] = useState([]);
-  const [comment, setComment] = useState([]);
+  const [comment, setComment] = useState("");
   const [likes, setLikes] = useState([]);
-  const [hasLiked, sethasLiked] = useState(false);
+  const [hasLiked, setHasLiked] = useState(false);
   useEffect(
     () =>
       onSnapshot(
@@ -48,11 +48,15 @@ const Post = ({ id, userImg, picture, caption, username }) => {
       ),
     [db, id]
   );
-  useEffect(() => {
-    return sethasLiked(
-      likes.findIndex((like) => like.id === session?.user?.uid) !== -1
-    );
-  }, [likes]);
+
+  useEffect(
+    () =>
+      setHasLiked(
+        likes.findIndex((like) => like.id === session?.user?.uid) !== -1
+      ),
+    [likes]
+  );
+
   const likePost = async () => {
     if (hasLiked) {
       await deleteDoc(doc(db, "posts", id, "likes", session.user.uid));
@@ -62,6 +66,7 @@ const Post = ({ id, userImg, picture, caption, username }) => {
       });
     }
   };
+
   const sendComment = async (e) => {
     e.preventDefault();
     const commentToSend = comment;
@@ -88,7 +93,15 @@ const Post = ({ id, userImg, picture, caption, username }) => {
       {session && (
         <div className="flex justify-between px-4 pt-4">
           <div className="flex space-x-4 ">
-            <HeartIcon onClick={likePost} className="btn" />
+            {hasLiked ? (
+              <HeartIconFilled
+                onClick={likePost}
+                className="btn text-red-500"
+              />
+            ) : (
+              <HeartIcon onClick={likePost} className="btn" />
+            )}
+
             <ChatIcon className="btn" />
             <PaperAirplaneIcon className="btn" />
           </div>
@@ -137,7 +150,7 @@ const Post = ({ id, userImg, picture, caption, username }) => {
             className="border-none flex-1 focus:ring-0 outline-none"
           />
           <button
-            disabled={!comment}
+            disabled={!comment.trim()}
             onClick={(e) => sendComment(e)}
             className="font-semibold text-blue-400"
           >
