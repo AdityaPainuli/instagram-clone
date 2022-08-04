@@ -26,6 +26,8 @@ import Momemt from "react-moment";
 
 const Post = ({ id, userImg, picture, caption, username }) => {
   const { data: session } = useSession();
+  // console.log(userImg);
+
   const [comments, setComments] = useState([]);
   const [comment, setComment] = useState("");
   const [likes, setLikes] = useState([]);
@@ -43,7 +45,7 @@ const Post = ({ id, userImg, picture, caption, username }) => {
   );
   useEffect(
     () =>
-      onSnapshot(collection(db, "posts", id, "likes"), (snapshot) =>
+      onSnapshot(query(collection(db, "posts", id, "likes")), (snapshot) =>
         setLikes(snapshot.docs)
       ),
     [db, id]
@@ -61,12 +63,11 @@ const Post = ({ id, userImg, picture, caption, username }) => {
     if (hasLiked) {
       await deleteDoc(doc(db, "posts", id, "likes", session.user.uid));
     } else {
-      await setDoc(doc(db, "posts", id, "likes", session.user.uid), {
+      await setDoc(doc(db, "posts", id, "likes", session?.user?.uid), {
         username: session.user.username,
       });
     }
   };
-
   const sendComment = async (e) => {
     e.preventDefault();
     const commentToSend = comment;
@@ -109,6 +110,9 @@ const Post = ({ id, userImg, picture, caption, username }) => {
         </div>
       )}
       <p className="p-5 truncate">
+        {likes.length > 0 && (
+          <p className="font-bold mb-1">{likes.length} likes</p>
+        )}
         <span className="font-bold mr-1">{username} </span>
         {caption}
       </p>

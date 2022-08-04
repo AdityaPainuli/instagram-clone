@@ -8,23 +8,26 @@ import {
   PaperAirplaneIcon,
   MenuIcon,
 } from "@heroicons/react/outline";
-import Avatar from "@mui/material/Avatar";
 import { useSession, signIn, signOut } from "next-auth/react";
 import { useRouter } from "next/router";
 import { useRecoilState } from "recoil";
 import { modelState } from "../atoms/modelAtom";
 
-const Header = () => {
+const Header = ({ searchShow }) => {
   const { data: session } = useSession();
   const [open, setOpen] = useRecoilState(modelState);
   const router = useRouter();
   return (
-    <div className="shadow-sm border-b bg-white sticky top-0 z-50">
-      <div className="flex justify-between max-w-6xl mx-5 xl:mx-auto">
+    <div className="shadow-sm border-b bg-white sticky top-0 z-50 ">
+      <div
+        className={`flex justify-between max-w-6xl mx-5 xl:mx-auto ${
+          !searchShow && "m-5"
+        }`}
+      >
         {/* Left Side */}
         <div
           onClick={() => router.push("/")}
-          className="relative hidden lg:inline-grid w-24 cursor-pointer"
+          className="relative hidden  lg:inline-grid w-24 cursor-pointer"
         >
           <Image
             src="https://1000logos.net/wp-content/uploads/2017/02/Logo-Instagram.png"
@@ -43,25 +46,31 @@ const Header = () => {
           />
         </div>
         {/* Middle Side */}
+
         <div className="max-w-xs">
           <div className="relative mt-1 p-3 rounded-md  ">
-            <div className="absolute inset-y-0 flex pl-3 items-center pointer-events-none">
-              <SearchIcon className="h-5 w-5 text-gray-400" />
-            </div>
-            <input
-              className="bg-gray-50 block w-full pl-10 sm:text-sm border-gray-300 py-1.5 rounded-md focus:ring-black focus:border-black"
-              type="search"
-              placeholder="Search"
-            />
+            {searchShow && (
+              <>
+                <div className="absolute inset-y-0 flex pl-3 items-center pointer-events-none">
+                  <SearchIcon className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                  className="bg-gray-50 block w-full pl-10 sm:text-sm border-gray-300 py-1.5 rounded-md focus:ring-black focus:border-black"
+                  type="search"
+                  placeholder="Search"
+                />
+              </>
+            )}
           </div>
         </div>
+
         {/* Right side */}
         <div
           onClick={() => router.push("/")}
           className="flex items-center justify-end space-x-4"
         >
           <HomeIcon className="nav-button" />
-          <MenuIcon className="h-6 md:hidden cursor-pointer" />
+          {/* <MenuIcon className="h-6 md:hidden cursor-pointer" /> */}
           {session ? (
             <>
               <div className="relative nav-button">
@@ -71,20 +80,20 @@ const Header = () => {
                 </div>
               </div>
               <PlusCircleIcon
-                className="nav-button"
+                className="add-button"
                 onClick={() => setOpen(true)}
               />
               <UserGroupIcon className="nav-button" />
               <HeartIcon className="nav-button" />
               <img
                 onClick={signOut}
-                src={session.user.image}
+                src={session?.user?.image}
                 alt={session.user.name}
                 className="h-10 w-10 rounded-full cursor-pointer"
               />
             </>
           ) : (
-            <button onClick={signIn}>Sign in</button>
+            <>{searchShow && <button onClick={signIn}>Sign in</button>}</>
           )}
         </div>
       </div>

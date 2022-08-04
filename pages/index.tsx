@@ -14,7 +14,7 @@ const Home: NextPage = () => {
         />
       </Head>
       {/* Header */}
-      <Header />
+      <Header searchShow={true} />
       <Feed />
       <Modal />
     </div>
